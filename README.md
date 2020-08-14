@@ -7,9 +7,9 @@
 ## airflow job
 - /data/airflow/dags/ 경로로 옮기기
 
-'''
+```
 source /data/airflow/venv/bin/activate
 airflow initdb
-'''
+```
 
 - airflow console 확인
