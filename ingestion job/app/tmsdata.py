@@ -1,5 +1,5 @@
 """
-T-DEAL Druid 적재 - landingtype
+T-DEAL Druid 적재 - tmsdata
 """
 import socket
 from datetime import datetime
@@ -10,16 +10,20 @@ import os
 import boto3
 import requests, json
 
+# read filename
+targetPath = 'ls /data/s3data/tmsdata'
+targetName = os.popen(targetPath).read().split('\n')[0]
+
 def run(logger):
 
     # dataName 넣기
-    logger.info('======== Start landingtype =========')
+    logger.info('======== Start tmsdata =========')
     try:
         # folderName = folder name in mounted bucket(metatron-druid-tdeal)
-        sourceDataPath = 'data/s3data/landing-type'
+        sourceDataPath = 'data/s3data/tmsdata'
         
         ## 현재가 수정할 곳 1 : 적재 csv 이름, 적재 후 discovery 데이터 소스(images 폴더 참고)
-        filterFile = '${fildName}.csv'
+        filterFile = 'targetName'
         datasourceName = '${dataSourceName}'
         intervalValue = '1900-01-01T00:00:00.000Z/2100-01-01T00:00:00.000Z'
 
@@ -63,7 +67,7 @@ def run(logger):
         headers = {'charset' : 'utf-8'}
         response = requests.delete(URL, headers = headers)
         logger.info('Status Code : ' + str(response.status_code))
-        logger.info('====== DELETE landingtype =====')
+        logger.info('====== DELETE tmsdata =====')
 
         URL = ingestionUrl + 'druid/indexer/v1/task'
         headers = {'Content-Type': 'application/json; charset=utf-8'}
@@ -74,6 +78,6 @@ def run(logger):
         response = requests.post(URL, headers = headers, data = jsonString)
         logger.info('Status Code : ' + str(response.status_code))
         logger.info('Response Data : ' + str(response.json()))
-        logger.info('====== Finish - landingtype =====')
+        logger.info('====== Finish - tmsdata =====')
     except:
         logger.exception("Got exception on sample")

@@ -1,5 +1,5 @@
 """
-T-DEAL Druid 적재 - inventory
+T-DEAL Druid 적재 - landingtype
 """
 import socket
 from datetime import datetime
@@ -10,16 +10,20 @@ import os
 import boto3
 import requests, json
 
+# read filename
+targetPath = 'ls /data/s3data/landing-type'
+targetName = os.popen(targetPath).read().split('\n')[0]
+
 def run(logger):
 
     # dataName 넣기
-    logger.info('======== Start inventory =========')
+    logger.info('======== Start landingtype =========')
     try:
         # folderName = folder name in mounted bucket(metatron-druid-tdeal)
-        sourceDataPath = 'data/s3data/inventory'
+        sourceDataPath = 'data/s3data/landing-type'
         
         ## 현재가 수정할 곳 1 : 적재 csv 이름, 적재 후 discovery 데이터 소스(images 폴더 참고)
-        filterFile = '${fildName}.csv'
+        filterFile = 'targetName'
         datasourceName = '${dataSourceName}'
         intervalValue = '1900-01-01T00:00:00.000Z/2100-01-01T00:00:00.000Z'
 
@@ -27,7 +31,7 @@ def run(logger):
         ingestionUrl = TargetConfig.DRUID_INGESTION_URL
         deleteUrl = TargetConfig.DRUID_DELETE_URL
 
-        # 현재가 수정할 곳 2 : druid Overload Console에서 log 확인, 아래 변수명은 유지
+        # 현재가 수정할 곳 2 : druid Overload Console에서 log 확인
         ingestionSpec = {
             "type": "index",
             "spec": {
@@ -63,7 +67,7 @@ def run(logger):
         headers = {'charset' : 'utf-8'}
         response = requests.delete(URL, headers = headers)
         logger.info('Status Code : ' + str(response.status_code))
-        logger.info('====== DELETE inventory =====')
+        logger.info('====== DELETE landingtype =====')
 
         URL = ingestionUrl + 'druid/indexer/v1/task'
         headers = {'Content-Type': 'application/json; charset=utf-8'}
@@ -74,6 +78,6 @@ def run(logger):
         response = requests.post(URL, headers = headers, data = jsonString)
         logger.info('Status Code : ' + str(response.status_code))
         logger.info('Response Data : ' + str(response.json()))
-        logger.info('====== Finish - inventory =====')
+        logger.info('====== Finish - landingtype =====')
     except:
         logger.exception("Got exception on sample")
