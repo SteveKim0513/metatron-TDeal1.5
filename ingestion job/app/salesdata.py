@@ -20,7 +20,7 @@ def run(logger):
     logger.info('======== Start salesdata =========')
     try:
         # folderName = folder name in mounted bucket(metatron-druid-tdeal)
-        sourceDataPath = 'data/s3data/salesdata'
+        sourceDataPath = '/data/s3data/salesdata'
         
         ## 현재가 수정할 곳 1 : 적재 csv 이름, 적재 후 discovery 데이터 소스(images 폴더 참고)
         filterFile = 'targetName'

@@ -1,6 +1,7 @@
 from datetime import timedelta
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
+from airflow.contrib.operators.ssh_operator import SSHOperator
 from airflow.utils.dates import days_ago
 
 default_args = {
@@ -66,7 +67,14 @@ endlog = BashOperator(
 )
 
 
+
 runVM.set_downstream(startlog)
 moveDir.set_downstream(runVM)
 runIngestion.set_downstream(moveDir)
 endlog.set_downstream(runIngestion)
+
+SSH = SSHOperator(
+    ssh_conn_id='druid',
+    task_id='SSH',
+    command=startlog,
+    dag=DAG)
