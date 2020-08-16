@@ -13,7 +13,6 @@ import requests, json
 # read filename
 targetPath = 'ls /data/s3data/salesdata'
 targetName = os.popen(targetPath).read().split('\n')[0]
-print(targetName)
 
 def run(logger):
 

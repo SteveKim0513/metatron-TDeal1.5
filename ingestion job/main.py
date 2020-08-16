@@ -4,7 +4,7 @@ T-DEAL AIRFLOW 배치
 from datetime import datetime
 import argparse
 from util.util import CreateLogger
-from app import inventory, salesdata, landingtype, campaigndata, tmsdata, simulation
+from app import tmsdata #inventory, salesdata, landingtype, campaigndata, , simulation
 ## app folder 내 파일명이 import되는 것과 일치해야함
 
 def main(args, logger):
