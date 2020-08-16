@@ -19,7 +19,7 @@ def run(logger):
     # dataName 넣기
     logger.info('======== Start inventory =========')
     try:
-        filterFile = 'targetName'
+        filterFile = targetName
         intervalValue = '1900-01-01T00:00:00.000Z/2100-01-01T00:00:00.000Z'
 
         # DRUID END POINT
