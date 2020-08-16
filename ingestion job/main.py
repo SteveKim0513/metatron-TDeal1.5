@@ -37,7 +37,7 @@ def main(args, logger):
             except:
                 logger.exception("Got exception on main - TMSDATA")
         elif target == 'SIMULATION':
-              try:
+            try:
                 simulation.run(logger)
             except:
                 logger.exception("Got exception on main - SIMULATION")
