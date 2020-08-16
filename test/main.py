@@ -16,8 +16,6 @@ def main(args, logger):
             except:
                 logger.exception("Got exception on main - TEST")
 
-
-
 if __name__ == '__main__':
     start_time = datetime.now().strftime('%Y%m%d_%H%M')
     logger = CreateLogger('batch', "logs/{socket.gethostname()}_log.log")
