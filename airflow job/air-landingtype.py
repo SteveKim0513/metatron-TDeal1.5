@@ -33,10 +33,27 @@ dag = DAG(
     schedule_interval=timedelta(minutes=5)
 )
 
-
 startlog = BashOperator(
     task_id='start-log-landingtype',
     bash_command='echo "START AIRFLOW for landingtype',
+    dag=dag
+)
+
+rootUser = BashOperator(
+    task_id='rootUser-landingtype',
+    bash_command='sudo su -',
+    dag=dag
+)
+
+chownFile = BashOperator(
+    task_id='chownFile-landingtype',
+    bash_command='chown -R metatron:metatron /data/s3data/landing-type',
+    dag=dag
+)
+
+metatronUser = BashOperator(
+    task_id='metatronUser-landingtype',
+    bash_command='sudo su metatron',
     dag=dag
 )
 
@@ -58,15 +75,16 @@ runIngestion = BashOperator(
     dag=dag
 )
 
-
 endlog = BashOperator(
     task_id='end-log-landingtype',
     bash_command='echo "END AIRFLOW for landingtype',
     dag=dag
 )
 
-
-runVM.set_downstream(startlog)
+rootUser.set_downstream(startlog)
+chownFile.set_downstream(rootUser)
+metatronUser.set_downstream(chownFile)
+runVM.set_downstream(metatronUser)
 moveDir.set_downstream(runVM)
 runIngestion.set_downstream(moveDir)
 endlog.set_downstream(runIngestion)

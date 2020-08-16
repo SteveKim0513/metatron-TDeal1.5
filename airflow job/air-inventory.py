@@ -40,6 +40,24 @@ startlog = BashOperator(
     dag=dag
 )
 
+rootUser = BashOperator(
+    task_id='rootUser-inventory'',
+    bash_command='sudo su -',
+    dag=dag
+)
+
+chownFile = BashOperator(
+    task_id='chownFile-inventory'',
+    bash_command='chown -R metatron:metatron /data/s3data/inventory'',
+    dag=dag
+)
+
+metatronUser = BashOperator(
+    task_id='metatronUser-inventory'',
+    bash_command='sudo su metatron',
+    dag=dag
+)
+
 runVM = BashOperator(
     task_id='runVM-inventory',
     bash_command='source /data/druid-ingestion/druid-batch/bin/activate',
@@ -58,15 +76,16 @@ runIngestion = BashOperator(
     dag=dag
 )
 
-
 endlog = BashOperator(
     task_id='end-log-inventory',
     bash_command='echo "END AIRFLOW for inventory',
     dag=dag
 )
 
-
-runVM.set_downstream(startlog)
+rootUser.set_downstream(startlog)
+chownFile.set_downstream(rootUser)
+metatronUser.set_downstream(chownFile)
+runVM.set_downstream(metatronUser)
 moveDir.set_downstream(runVM)
 runIngestion.set_downstream(moveDir)
 endlog.set_downstream(runIngestion)

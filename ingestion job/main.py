@@ -4,7 +4,7 @@ T-DEAL AIRFLOW 배치
 from datetime import datetime
 import argparse
 from util.util import CreateLogger
-from app import inventory, salesdata, landingtype, campaigndata, tmsdata
+from app import inventory, salesdata, landingtype, campaigndata, tmsdata, simulation
 ## app folder 내 파일명이 import되는 것과 일치해야함
 
 def main(args, logger):
@@ -36,6 +36,11 @@ def main(args, logger):
                 tmsdata.run(logger)
             except:
                 logger.exception("Got exception on main - TMSDATA")
+        elif target == 'SIMULATION':
+              try:
+                simulation.run(logger)
+            except:
+                logger.exception("Got exception on main - SIMULATION")
 
         ## add condition
         '''

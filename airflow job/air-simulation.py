@@ -27,59 +27,59 @@ default_args = {
     # 'trigger_rule': 'all_success'
 }
 dag = DAG(
-    'air-campaigndata',
+    'air-simulation',
     default_args=default_args,
-    description='schedule air-campaigndata',
+    description='schedule air-simulation',
     schedule_interval=timedelta(minutes=5)
 )
 
 
 startlog = BashOperator(
-    task_id='start-log-campaigndata',
-    bash_command='echo "START AIRFLOW for campaigndata',
+    task_id='start-log-simulation',
+    bash_command='echo "START AIRFLOW for simulation',
     dag=dag
 )
 
 rootUser = BashOperator(
-    task_id='rootUser-campaigndata',
+    task_id='rootUser-simulation',
     bash_command='sudo su -',
     dag=dag
 )
 
 chownFile = BashOperator(
-    task_id='chownFile-campaigndata',
-    bash_command='chown -R metatron:metatron /data/s3data/campaign-data',
+    task_id='chownFile-simulation',
+    bash_command='chown -R metatron:metatron /data/s3data/simulation',
     dag=dag
 )
 
 metatronUser = BashOperator(
-    task_id='metatronUser-campaigndata',
+    task_id='metatronUser-simulation',
     bash_command='sudo su metatron',
     dag=dag
 )
 
 runVM = BashOperator(
-    task_id='runVM-campaigndata',
+    task_id='runVM-simulation',
     bash_command='source /data/druid-ingestion/druid-batch/bin/activate',
     dag=dag
 )
 
 moveDir = BashOperator(
-    task_id='move-directory-druid-ingestion-campaigndata',
+    task_id='move-directory-druid-ingestion-simulation',
     bash_command='cd /data/druid-ingestion/t-deal-discovery/',
     dag=dag
 )
 
 runIngestion = BashOperator(
-    task_id='run-druid-ingestion-campaigndata',
-    bash_command='python3.7 main.py --target CAMPAIGNDATA',
+    task_id='run-druid-ingestion-simulation',
+    bash_command='python3.7 main.py --target SIMULATION',
     dag=dag
 )
 
 
 endlog = BashOperator(
-    task_id='end-log-campaigndata',
-    bash_command='echo "END AIRFLOW for campaigndata',
+    task_id='end-log-simulation',
+    bash_command='echo "END AIRFLOW for simulation',
     dag=dag
 )
 

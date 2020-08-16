@@ -11,26 +11,16 @@ def run(logger):
     logger.info('======== Start genieworks =========')
     global nameOfFile
     try:
-        # aws configure 설정 필수
-        client = boto3.client('s3')
-        resource = boto3.resource('s3')
-        bucket = 'tdeal-dashboard-bucket'
-        prefix = 'genieworks/'
-        downloadFile = 'data/download/genieworks.csv'
+        downloadFile = '/data/druid-ingestion/t-deal-discovery/data/download/genieworks.csv'
         filterFile = 'genieworks.csv'
-        datasourceName = 'finalgenieworks'
+        datasourceName = 'genieworkstest'
         intervalValue = '1900-01-01T00:00:00.000Z/2100-01-01T00:00:00.000Z'
 
-        # Find Name Of File
-        paginator = client.get_paginator('list_objects')
-        data = paginator.paginate(Bucket=bucket, Delimiter='/', Prefix=prefix)
-        for item in data.search('Contents'):
-            nameOfFile = item.get('Key')
         # DRUID END POINT
         ingestionUrl = TargetConfig.DRUID_INGESTION_URL
         deleteUrl = TargetConfig.DRUID_DELETE_URL
         # Download File
-        resource.Bucket(bucket).download_file(nameOfFile, downloadFile)
+        # resource.Bucket(bucket).download_file(nameOfFile, downloadFile)
         ingestionSpec = {
             "type": "index",
             "spec": {

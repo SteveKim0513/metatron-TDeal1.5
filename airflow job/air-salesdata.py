@@ -41,6 +41,25 @@ startlog = BashOperator(
     dag=dag
 )
 
+
+rootUser = BashOperator(
+    task_id='rootUser-salesdata',
+    bash_command='sudo su -',
+    dag=dag
+)
+
+chownFile = BashOperator(
+    task_id='chownFile-salesdata',
+    bash_command='chown -R metatron:metatron /data/s3data/salesdata',
+    dag=dag
+)
+
+metatronUser = BashOperator(
+    task_id='metatronUser-salesdata',
+    bash_command='sudo su metatron',
+    dag=dag
+)
+
 runVM = BashOperator(
     task_id='runVM-salesdata',
     bash_command='source /data/druid-ingestion/druid-batch/bin/activate',
@@ -59,22 +78,16 @@ runIngestion = BashOperator(
     dag=dag
 )
 
-
 endlog = BashOperator(
     task_id='end-log-salesdata',
     bash_command='echo "END AIRFLOW for salesdata',
     dag=dag
 )
 
-
-
-runVM.set_downstream(startlog)
+rootUser.set_downstream(startlog)
+chownFile.set_downstream(rootUser)
+metatronUser.set_downstream(chownFile)
+runVM.set_downstream(metatronUser)
 moveDir.set_downstream(runVM)
 runIngestion.set_downstream(moveDir)
 endlog.set_downstream(runIngestion)
-
-SSH = SSHOperator(
-    ssh_conn_id='druid',
-    task_id='SSH',
-    command=startlog,
-    dag=DAG)

@@ -19,48 +19,22 @@ def run(logger):
     # dataName 넣기
     logger.info('======== Start landingtype =========')
     try:
-        # folderName = folder name in mounted bucket(metatron-druid-tdeal)
-        sourceDataPath = 'data/s3data/landing-type'
-        
-        ## 현재가 수정할 곳 1 : 적재 csv 이름, 적재 후 discovery 데이터 소스(images 폴더 참고)
         filterFile = 'targetName'
-        datasourceName = '${dataSourceName}'
         intervalValue = '1900-01-01T00:00:00.000Z/2100-01-01T00:00:00.000Z'
 
         # DRUID END POINT
         ingestionUrl = TargetConfig.DRUID_INGESTION_URL
         deleteUrl = TargetConfig.DRUID_DELETE_URL
 
+        # folderName = folder name in mounted bucket(metatron-druid-tdeal)
+        sourceDataPath = 'data/s3data/landing-type'
+        
+        ## 현재가 수정할 곳 1 : 적재 후 discovery 데이터 소스(images 폴더 참고)
+        datasourceName = '${dataSourceName}'
+
+
         # 현재가 수정할 곳 2 : druid Overload Console에서 log 확인
         ingestionSpec = {
-            "type": "index",
-            "spec": {
-                "dataSchema": {
-                    "dataSource": datasourceName,
-                    "parser": {
-                        ...
-                    "enforceType": True,
-                    "granularitySpec": {
-                        "type": "uniform",
-                        "segmentGranularity": "MONTH",
-                        "queryGranularity": "HOUR",
-                        "rollup": False,
-                        "append": False,
-                        "intervals": [intervalValue]
-                    }
-                },
-                "ioConfig": {
-                    "type": "index",
-                    "firehose": {
-                        "type": "local",
-                        "baseDir": sourceDataPath,
-                        "filter": filterFile
-                    }
-                },
-                ...
-            },
-            "dataSource": datasourceName,
-            "interval": intervalValue
         }
 
         URL = deleteUrl + '/druid/coordinator/v1/datasources/' + datasourceName
