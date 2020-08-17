@@ -47,13 +47,13 @@ rootUser = BashOperator(
 )
 
 chownFile = BashOperator(
-    task_id='chownFile-inventory'',
+    task_id='chownFile-inventory',
     bash_command='chown -R metatron:metatron /data/s3data/inventory'',
     dag=dag
 )
 
 metatronUser = BashOperator(
-    task_id='metatronUser-inventory'',
+    task_id='metatronUser-inventory',
     bash_command='sudo su metatron',
     dag=dag
 )
