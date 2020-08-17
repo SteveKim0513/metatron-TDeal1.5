@@ -48,7 +48,7 @@ rootUser = BashOperator(
 
 chownFile = BashOperator(
     task_id='chownFile-inventory',
-    bash_command='chown -R metatron:metatron /data/s3data/inventory'',
+    bash_command='chown -R metatron:metatron /data/s3data/inventory',
     dag=dag
 )
 
