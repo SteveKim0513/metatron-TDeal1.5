@@ -1,14 +1,10 @@
 """
 T-DEAL Druid 적재 - tmsdata
 """
-import socket
-from datetime import datetime
-import argparse
-from util.util import CreateLogger
-from config.config import TargetConfig
-import os
 import boto3
-import requests, json
+import json
+import requests
+from config.config import TargetConfig
 
 # read filename
 targetPath = 'ls /data/s3data/tmsdata'
@@ -108,7 +104,7 @@ def run(logger):
                     "type": "index",
                     "firehose": {
                         "type": "local",
-                        "baseDir": sourceDataPath,
+                        "baseDir": "/data/s3data/tmsdata",
                         "filter": filterFile
                     }
                 },

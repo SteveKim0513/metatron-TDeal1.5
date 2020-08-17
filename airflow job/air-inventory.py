@@ -41,7 +41,7 @@ startlog = BashOperator(
 )
 
 rootUser = BashOperator(
-    task_id='rootUser-inventory'',
+    task_id='rootUser-inventory',
     bash_command='sudo su -',
     dag=dag
 )

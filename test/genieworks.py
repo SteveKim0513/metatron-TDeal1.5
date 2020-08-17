@@ -128,7 +128,7 @@ def run(logger):
                     "type": "index",
                     "firehose": {
                         "type": "local",
-                        "baseDir": "/home/druid/app/druid-ingestion/data/download/",
+                        "baseDir": "/data/s3data/test",
                         "filter": filterFile
                     }
                 },
