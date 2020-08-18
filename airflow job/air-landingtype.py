@@ -29,62 +29,29 @@ default_args = {
 dag = DAG(
     'air-landingtype',
     default_args=default_args,
-    description='schedule air-landingtype',
+    description='schedule landingtype',
     schedule_interval=timedelta(minutes=5)
 )
 
 startlog = BashOperator(
     task_id='start-log-landingtype',
-    bash_command='echo "START AIRFLOW for landingtype',
+    bash_command='echo "START"',
     dag=dag
 )
 
-rootUser = BashOperator(
-    task_id='rootUser-landingtype',
-    bash_command='sudo su -',
-    dag=dag
-)
-
-chownFile = BashOperator(
-    task_id='chownFile-landingtype',
-    bash_command='chown -R metatron:metatron /data/s3data/landing-type',
-    dag=dag
-)
-
-metatronUser = BashOperator(
-    task_id='metatronUser-landingtype',
-    bash_command='sudo su metatron',
-    dag=dag
-)
-
-runVM = BashOperator(
+runVM = 'source /data/druid-ingestion/druid-batch/bin/activate\n' + 'cd /data/druid-ingestion/t-deal-discovery\n' + 'python3 main.py --target LANDINGTYPE\n'
+VMBash = BashOperator(
     task_id='runVM-landingtype',
-    bash_command='source /data/druid-ingestion/druid-batch/bin/activate',
-    dag=dag
-)
-
-moveDir = BashOperator(
-    task_id='move-directory-druid-ingestion-landingtype',
-    bash_command='cd /data/druid-ingestion/t-deal-discovery/',
-    dag=dag
-)
-
-runIngestion = BashOperator(
-    task_id='run-druid-ingestion-landingtype',
-    bash_command='python3.7 main.py --target LANDINGTYPE',
+    bash_command=runVM,
     dag=dag
 )
 
 endlog = BashOperator(
     task_id='end-log-landingtype',
-    bash_command='echo "END AIRFLOW for landingtype',
+    bash_command='echo "END"',
     dag=dag
 )
 
-rootUser.set_downstream(startlog)
-chownFile.set_downstream(rootUser)
-metatronUser.set_downstream(chownFile)
-runVM.set_downstream(metatronUser)
-moveDir.set_downstream(runVM)
-runIngestion.set_downstream(moveDir)
-endlog.set_downstream(runIngestion)
+
+startlog.set_downstream(VMBash)
+VMBash.set_downstream(endlog)

@@ -29,64 +29,29 @@ default_args = {
 dag = DAG(
     'air-simulation',
     default_args=default_args,
-    description='schedule air-simulation',
+    description='schedule simulation',
     schedule_interval=timedelta(minutes=5)
 )
 
-
 startlog = BashOperator(
     task_id='start-log-simulation',
-    bash_command='echo "START AIRFLOW for simulation',
+    bash_command='echo "START"',
     dag=dag
 )
 
-rootUser = BashOperator(
-    task_id='rootUser-simulation',
-    bash_command='sudo su -',
-    dag=dag
-)
-
-chownFile = BashOperator(
-    task_id='chownFile-simulation',
-    bash_command='chown -R metatron:metatron /data/s3data/simulation',
-    dag=dag
-)
-
-metatronUser = BashOperator(
-    task_id='metatronUser-simulation',
-    bash_command='sudo su metatron',
-    dag=dag
-)
-
-runVM = BashOperator(
+runVM = 'source /data/druid-ingestion/druid-batch/bin/activate\n' + 'cd /data/druid-ingestion/t-deal-discovery\n' + 'python3 main.py --target SIMULATION\n'
+VMBash = BashOperator(
     task_id='runVM-simulation',
-    bash_command='source /data/druid-ingestion/druid-batch/bin/activate',
+    bash_command=runVM,
     dag=dag
 )
-
-moveDir = BashOperator(
-    task_id='move-directory-druid-ingestion-simulation',
-    bash_command='cd /data/druid-ingestion/t-deal-discovery/',
-    dag=dag
-)
-
-runIngestion = BashOperator(
-    task_id='run-druid-ingestion-simulation',
-    bash_command='python3.7 main.py --target SIMULATION',
-    dag=dag
-)
-
 
 endlog = BashOperator(
     task_id='end-log-simulation',
-    bash_command='echo "END AIRFLOW for simulation',
+    bash_command='echo "END"',
     dag=dag
 )
 
-rootUser.set_downstream(startlog)
-chownFile.set_downstream(rootUser)
-metatronUser.set_downstream(chownFile)
-runVM.set_downstream(metatronUser)
-moveDir.set_downstream(runVM)
-runIngestion.set_downstream(moveDir)
-endlog.set_downstream(runIngestion)
+
+startlog.set_downstream(VMBash)
+VMBash.set_downstream(endlog)

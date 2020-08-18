@@ -29,63 +29,29 @@ default_args = {
 dag = DAG(
     'air-inventory',
     default_args=default_args,
-    description='schedule air-inventory',
+    description='schedule inventory',
     schedule_interval=timedelta(minutes=5)
 )
 
-
 startlog = BashOperator(
     task_id='start-log-inventory',
-    bash_command='echo "START AIRFLOW for inventory',
+    bash_command='echo "START"',
     dag=dag
 )
 
-rootUser = BashOperator(
-    task_id='rootUser-inventory',
-    bash_command='sudo su -',
-    dag=dag
-)
-
-chownFile = BashOperator(
-    task_id='chownFile-inventory',
-    bash_command='chown -R metatron:metatron /data/s3data/inventory',
-    dag=dag
-)
-
-metatronUser = BashOperator(
-    task_id='metatronUser-inventory',
-    bash_command='sudo su metatron',
-    dag=dag
-)
-
-runVM = BashOperator(
+runVM = 'source /data/druid-ingestion/druid-batch/bin/activate\n' + 'cd /data/druid-ingestion/t-deal-discovery\n' + 'python3 main.py --target INVENTORY\n'
+VMBash = BashOperator(
     task_id='runVM-inventory',
-    bash_command='source /data/druid-ingestion/druid-batch/bin/activate',
-    dag=dag
-)
-
-moveDir = BashOperator(
-    task_id='move-directory-druid-ingestion-inventory',
-    bash_command='cd /data/druid-ingestion/t-deal-discovery/',
-    dag=dag
-)
-
-runIngestion = BashOperator(
-    task_id='run-druid-ingestion-inventory',
-    bash_command='python3.7 main.py --target INVENTORY',
+    bash_command=runVM,
     dag=dag
 )
 
 endlog = BashOperator(
     task_id='end-log-inventory',
-    bash_command='echo "END AIRFLOW for inventory',
+    bash_command='echo "END"',
     dag=dag
 )
 
-rootUser.set_downstream(startlog)
-chownFile.set_downstream(rootUser)
-metatronUser.set_downstream(chownFile)
-runVM.set_downstream(metatronUser)
-moveDir.set_downstream(runVM)
-runIngestion.set_downstream(moveDir)
-endlog.set_downstream(runIngestion)
+
+startlog.set_downstream(VMBash)
+VMBash.set_downstream(endlog)

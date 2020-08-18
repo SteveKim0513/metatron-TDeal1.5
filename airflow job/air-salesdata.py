@@ -1,7 +1,6 @@
 from datetime import timedelta
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
-from airflow.contrib.operators.ssh_operator import SSHOperator
 from airflow.utils.dates import days_ago
 
 default_args = {
@@ -30,64 +29,29 @@ default_args = {
 dag = DAG(
     'air-salesdata',
     default_args=default_args,
-    description='schedule air-salesdata',
+    description='schedule salesdata',
     schedule_interval=timedelta(minutes=5)
 )
 
-
 startlog = BashOperator(
     task_id='start-log-salesdata',
-    bash_command='echo "START AIRFLOW for salesdata',
+    bash_command='echo "START"',
     dag=dag
 )
 
-
-rootUser = BashOperator(
-    task_id='rootUser-salesdata',
-    bash_command='sudo su -',
-    dag=dag
-)
-
-chownFile = BashOperator(
-    task_id='chownFile-salesdata',
-    bash_command='chown -R metatron:metatron /data/s3data/salesdata',
-    dag=dag
-)
-
-metatronUser = BashOperator(
-    task_id='metatronUser-salesdata',
-    bash_command='sudo su metatron',
-    dag=dag
-)
-
-runVM = BashOperator(
+runVM = 'source /data/druid-ingestion/druid-batch/bin/activate\n' + 'cd /data/druid-ingestion/t-deal-discovery\n' + 'python3 main.py --target SALESDATA\n'
+VMBash = BashOperator(
     task_id='runVM-salesdata',
-    bash_command='source /data/druid-ingestion/druid-batch/bin/activate',
-    dag=dag
-)
-
-moveDir = BashOperator(
-    task_id='move-directory-druid-ingestion-salesdata',
-    bash_command='cd /data/druid-ingestion/t-deal-discovery/',
-    dag=dag
-)
-
-runIngestion = BashOperator(
-    task_id='run-druid-ingestion-salesdata',
-    bash_command='python3.7 main.py --target SALESDATA',
+    bash_command=runVM,
     dag=dag
 )
 
 endlog = BashOperator(
     task_id='end-log-salesdata',
-    bash_command='echo "END AIRFLOW for salesdata',
+    bash_command='echo "END"',
     dag=dag
 )
 
-rootUser.set_downstream(startlog)
-chownFile.set_downstream(rootUser)
-metatronUser.set_downstream(chownFile)
-runVM.set_downstream(metatronUser)
-moveDir.set_downstream(runVM)
-runIngestion.set_downstream(moveDir)
-endlog.set_downstream(runIngestion)
+
+startlog.set_downstream(VMBash)
+VMBash.set_downstream(endlog)
